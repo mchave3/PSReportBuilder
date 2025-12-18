@@ -1,5 +1,5 @@
 #Requires -RunAsAdministrator
-#Requires -Version 5.1
+#Requires -Version 7.5
 
 <#
 .SYNOPSIS
@@ -184,7 +184,7 @@ function AwaitForExit {
     exit
 }
 
-# Function to load XAML and create WPF window
+# Function to load XAML and create WPF window with Fluent theme
 function New-WPFWindow {
     [CmdletBinding()]
     param(
@@ -207,6 +207,16 @@ function New-WPFWindow {
 
     $reader = [System.Xml.XmlReader]::Create([System.IO.StringReader]::new($xamlContent))
     $window = [System.Windows.Markup.XamlReader]::Load($reader)
+
+    # Apply Fluent theme (requires PowerShell 7.5+ / .NET 9)
+    # ThemeMode: System = follows Windows theme, Light, Dark, or None
+    try {
+        # Suppress experimental API warning WPF0001
+        $window.ThemeMode = [System.Windows.ThemeMode]::System
+    }
+    catch {
+        Write-Warning "Could not apply Fluent theme: $_"
+    }
 
     return $window
 }

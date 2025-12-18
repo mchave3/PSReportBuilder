@@ -33,6 +33,23 @@ if ($ExecutionContext.SessionState.LanguageMode -ne "FullLanguage") {
     AwaitForExit
 }
 
+# Check if PowerShell 7.5 or later is installed (required for Fluent UI support)
+$pwshPath = Get-Command pwsh -ErrorAction SilentlyContinue
+if (-not $pwshPath) {
+    Write-Host "Error: PowerShell 7.5 or later is required to run PSReportBuilder." -ForegroundColor Red
+    Write-Host "Please install PowerShell 7.5+ from: https://github.com/PowerShell/PowerShell/releases" -ForegroundColor Yellow
+    AwaitForExit
+}
+
+$pwshVersion = & pwsh -NoProfile -Command '$PSVersionTable.PSVersion'
+if ($pwshVersion.Major -lt 7 -or ($pwshVersion.Major -eq 7 -and $pwshVersion.Minor -lt 5)) {
+    Write-Host "Error: PowerShell 7.5 or later is required. Current version: $pwshVersion" -ForegroundColor Red
+    Write-Host "Please update PowerShell from: https://github.com/PowerShell/PowerShell/releases" -ForegroundColor Yellow
+    AwaitForExit
+}
+
+Write-Host "> PowerShell version: $pwshVersion" -ForegroundColor Green
+
 try {
     Clear-Host
 }
@@ -160,7 +177,7 @@ catch {
     Write-Host "Warning: Unable to check Authenticode signature ($($_.Exception.Message))" -ForegroundColor Yellow
 }
 
-# Run PSReportBuilder script with the provided arguments
+# Run PSReportBuilder script with the provided arguments (using pwsh.exe for PowerShell 7.5+)
 try {
     $argumentList = @(
         "-NoProfile",
@@ -168,7 +185,7 @@ try {
         "-File", $mainScriptPath
     ) + $forwardedArguments
 
-    $psReportBuilderProcess = Start-Process -FilePath "powershell.exe" -PassThru -ArgumentList $argumentList -Verb RunAs -ErrorAction Stop
+    $psReportBuilderProcess = Start-Process -FilePath "pwsh.exe" -PassThru -ArgumentList $argumentList -Verb RunAs -ErrorAction Stop
 
     # Wait for the process to finish before continuing
     if ($null -ne $psReportBuilderProcess) {

@@ -5,59 +5,10 @@
     Height="500"
     Width="500"
     WindowStartupLocation="CenterOwner"
-    Background="#1E1E1E"
     ResizeMode="NoResize">
 
-    <Window.Resources>
-        <Style x:Key="DarkButton" TargetType="Button">
-            <Setter Property="Background" Value="#3C3C3C"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="15,8"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#505050"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
-            <Setter Property="Background" Value="#0078D4"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1084D9"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DarkTextBox" TargetType="TextBox">
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#3C3C3C"/>
-            <Setter Property="Padding" Value="8"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-
-        <Style x:Key="DarkComboBox" TargetType="ComboBox">
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#3C3C3C"/>
-            <Setter Property="Padding" Value="8"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-
-        <Style x:Key="DarkLabel" TargetType="Label">
-            <Setter Property="Foreground" Value="#CCCCCC"/>
-            <Setter Property="Margin" Value="5,5,5,0"/>
-        </Style>
-
-        <Style x:Key="DarkCheckBox" TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#CCCCCC"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-    </Window.Resources>
+    <!-- Fluent theme is applied via ThemeMode in code-behind (PowerShell 7.5+ / .NET 9) -->
+    <!-- No custom styles needed - using default Fluent theme styles -->
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -68,15 +19,15 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="🗃️ New Data Source" FontSize="18" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" Text="🗃️ New Data Source" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,20"/>
 
         <!-- Common Fields -->
         <StackPanel Grid.Row="1">
-            <Label Content="Source Name:" Style="{StaticResource DarkLabel}"/>
-            <TextBox x:Name="TxtDataSourceName" Style="{StaticResource DarkTextBox}" Text="New Source"/>
+            <Label Content="Source Name:" Margin="5,5,5,0"/>
+            <TextBox x:Name="TxtDataSourceName" Padding="8" Margin="5" Text="New Source"/>
 
-            <Label Content="Source Type:" Style="{StaticResource DarkLabel}"/>
-            <ComboBox x:Name="CmbDataSourceType" Style="{StaticResource DarkComboBox}">
+            <Label Content="Source Type:" Margin="5,5,5,0"/>
+            <ComboBox x:Name="CmbDataSourceType" Padding="8" Margin="5">
                 <ComboBoxItem Content="📄 CSV File" Tag="CSV" IsSelected="True"/>
                 <ComboBoxItem Content="📋 JSON File" Tag="JSON"/>
                 <ComboBoxItem Content="🗃️ SQL Server Database" Tag="SQL"/>
@@ -91,17 +42,17 @@
 
                 <!-- CSV Configuration -->
                 <StackPanel x:Name="CsvConfig" Visibility="Visible">
-                    <Label Content="CSV File Path:" Style="{StaticResource DarkLabel}"/>
+                    <Label Content="CSV File Path:" Margin="5,5,5,0"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TxtCsvPath" Grid.Column="0" Style="{StaticResource DarkTextBox}"/>
-                        <Button x:Name="BtnBrowseCsv" Grid.Column="1" Content="📂" Style="{StaticResource DarkButton}" Width="40"/>
+                        <TextBox x:Name="TxtCsvPath" Grid.Column="0" Padding="8" Margin="5"/>
+                        <Button x:Name="BtnBrowseCsv" Grid.Column="1" Content="📂" Width="40" Padding="10,5" Margin="5"/>
                     </Grid>
-                    <Label Content="Delimiter:" Style="{StaticResource DarkLabel}"/>
-                    <ComboBox x:Name="CmbCsvDelimiter" Style="{StaticResource DarkComboBox}">
+                    <Label Content="Delimiter:" Margin="5,5,5,0"/>
+                    <ComboBox x:Name="CmbCsvDelimiter" Padding="8" Margin="5">
                         <ComboBoxItem Content="Comma (,)" Tag="," IsSelected="True"/>
                         <ComboBoxItem Content="Semicolon (;)" Tag=";"/>
                         <ComboBoxItem Content="Tab" Tag="&#x9;"/>
@@ -111,48 +62,48 @@
 
                 <!-- JSON Configuration -->
                 <StackPanel x:Name="JsonConfig" Visibility="Collapsed">
-                    <Label Content="JSON File Path:" Style="{StaticResource DarkLabel}"/>
+                    <Label Content="JSON File Path:" Margin="5,5,5,0"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBox x:Name="TxtJsonPath" Grid.Column="0" Style="{StaticResource DarkTextBox}"/>
-                        <Button x:Name="BtnBrowseJson" Grid.Column="1" Content="📂" Style="{StaticResource DarkButton}" Width="40"/>
+                        <TextBox x:Name="TxtJsonPath" Grid.Column="0" Padding="8" Margin="5"/>
+                        <Button x:Name="BtnBrowseJson" Grid.Column="1" Content="📂" Width="40" Padding="10,5" Margin="5"/>
                     </Grid>
                 </StackPanel>
 
                 <!-- SQL Configuration -->
                 <StackPanel x:Name="SqlConfig" Visibility="Collapsed">
-                    <Label Content="SQL Server:" Style="{StaticResource DarkLabel}"/>
-                    <TextBox x:Name="TxtSqlServer" Style="{StaticResource DarkTextBox}" Text="localhost"/>
+                    <Label Content="SQL Server:" Margin="5,5,5,0"/>
+                    <TextBox x:Name="TxtSqlServer" Padding="8" Margin="5" Text="localhost"/>
 
-                    <Label Content="Database:" Style="{StaticResource DarkLabel}"/>
-                    <TextBox x:Name="TxtSqlDatabase" Style="{StaticResource DarkTextBox}"/>
+                    <Label Content="Database:" Margin="5,5,5,0"/>
+                    <TextBox x:Name="TxtSqlDatabase" Padding="8" Margin="5"/>
 
-                    <CheckBox x:Name="ChkSqlIntegrated" Content="Windows Integrated Authentication" Style="{StaticResource DarkCheckBox}" IsChecked="True"/>
+                    <CheckBox x:Name="ChkSqlIntegrated" Content="Windows Integrated Authentication" Margin="5" IsChecked="True"/>
 
                     <StackPanel x:Name="SqlCredentials" Visibility="Collapsed">
-                        <Label Content="Username:" Style="{StaticResource DarkLabel}"/>
-                        <TextBox x:Name="TxtSqlUsername" Style="{StaticResource DarkTextBox}"/>
+                        <Label Content="Username:" Margin="5,5,5,0"/>
+                        <TextBox x:Name="TxtSqlUsername" Padding="8" Margin="5"/>
 
-                        <Label Content="Password:" Style="{StaticResource DarkLabel}"/>
-                        <PasswordBox x:Name="TxtSqlPassword" Background="#2D2D2D" Foreground="White" BorderBrush="#3C3C3C" Padding="8" Margin="5"/>
+                        <Label Content="Password:" Margin="5,5,5,0"/>
+                        <PasswordBox x:Name="TxtSqlPassword" Padding="8" Margin="5"/>
                     </StackPanel>
 
-                    <Label Content="SQL Query:" Style="{StaticResource DarkLabel}"/>
-                    <TextBox x:Name="TxtSqlQuery" Style="{StaticResource DarkTextBox}" Height="80" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="SELECT * FROM "/>
+                    <Label Content="SQL Query:" Margin="5,5,5,0"/>
+                    <TextBox x:Name="TxtSqlQuery" Padding="8" Margin="5" Height="80" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="SELECT * FROM "/>
                 </StackPanel>
 
                 <!-- Graph Configuration -->
                 <StackPanel x:Name="GraphConfig" Visibility="Collapsed">
-                    <Label Content="Microsoft Graph Endpoint:" Style="{StaticResource DarkLabel}"/>
-                    <TextBox x:Name="TxtGraphEndpoint" Style="{StaticResource DarkTextBox}" Text="https://graph.microsoft.com/v1.0/"/>
+                    <Label Content="Microsoft Graph Endpoint:" Margin="5,5,5,0"/>
+                    <TextBox x:Name="TxtGraphEndpoint" Padding="8" Margin="5" Text="https://graph.microsoft.com/v1.0/"/>
 
-                    <TextBlock Text="ℹ️ Make sure you are connected to Microsoft Graph with Connect-MgGraph before using this source." Foreground="#FFA500" TextWrapping="Wrap" Margin="5"/>
+                    <TextBlock Text="ℹ️ Make sure you are connected to Microsoft Graph with Connect-MgGraph before using this source." Foreground="Orange" TextWrapping="Wrap" Margin="5"/>
 
-                    <Label Content="Common Endpoints:" Style="{StaticResource DarkLabel}"/>
-                    <ComboBox x:Name="CmbGraphPresets" Style="{StaticResource DarkComboBox}">
+                    <Label Content="Common Endpoints:" Margin="5,5,5,0"/>
+                    <ComboBox x:Name="CmbGraphPresets" Padding="8" Margin="5">
                         <ComboBoxItem Content="-- Select a preset --"/>
                         <ComboBoxItem Content="Users" Tag="https://graph.microsoft.com/v1.0/users"/>
                         <ComboBoxItem Content="Groups" Tag="https://graph.microsoft.com/v1.0/groups"/>
@@ -163,9 +114,9 @@
 
                 <!-- Manual Configuration -->
                 <StackPanel x:Name="ManualConfig" Visibility="Collapsed">
-                    <Label Content="Data (JSON format):" Style="{StaticResource DarkLabel}"/>
-                    <TextBox x:Name="TxtManualData" Style="{StaticResource DarkTextBox}" Height="150" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="[]"/>
-                    <TextBlock Text="ℹ️ Enter data in JSON array format." Foreground="#888888" Margin="5"/>
+                    <Label Content="Data (JSON format):" Margin="5,5,5,0"/>
+                    <TextBox x:Name="TxtManualData" Padding="8" Margin="5" Height="150" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Text="[]"/>
+                    <TextBlock Text="ℹ️ Enter data in JSON array format." Foreground="Gray" Margin="5"/>
                 </StackPanel>
 
             </StackPanel>
@@ -173,9 +124,9 @@
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button x:Name="BtnTestConnection" Content="🔍 Test" Style="{StaticResource DarkButton}"/>
-            <Button x:Name="BtnCancel" Content="Cancel" Style="{StaticResource DarkButton}"/>
-            <Button x:Name="BtnSaveDataSource" Content="✓ Add" Style="{StaticResource AccentButton}"/>
+            <Button x:Name="BtnTestConnection" Content="🔍 Test" Padding="15,8" Margin="5"/>
+            <Button x:Name="BtnCancel" Content="Cancel" Padding="15,8" Margin="5"/>
+            <Button x:Name="BtnSaveDataSource" Content="✓ Add" Padding="15,8" Margin="5"/>
         </StackPanel>
     </Grid>
 </Window>

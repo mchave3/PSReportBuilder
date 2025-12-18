@@ -4,62 +4,10 @@
     Title="PowerShell Report Builder"
     Height="800"
     Width="1200"
-    WindowStartupLocation="CenterScreen"
-    Background="#1E1E1E">
+    WindowStartupLocation="CenterScreen">
 
-    <Window.Resources>
-        <!-- Styles globaux -->
-        <Style x:Key="DarkButton" TargetType="Button">
-            <Setter Property="Background" Value="#3C3C3C"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#505050"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource DarkButton}">
-            <Setter Property="Background" Value="#0078D4"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#1084D9"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="DarkTextBox" TargetType="TextBox">
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#3C3C3C"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Margin" Value="2"/>
-        </Style>
-
-        <Style x:Key="DarkComboBox" TargetType="ComboBox">
-            <Setter Property="Background" Value="#2D2D2D"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderBrush" Value="#3C3C3C"/>
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="Margin" Value="2"/>
-        </Style>
-
-        <Style x:Key="DarkLabel" TargetType="Label">
-            <Setter Property="Foreground" Value="#CCCCCC"/>
-            <Setter Property="Margin" Value="2"/>
-        </Style>
-
-        <Style x:Key="SectionHeader" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="5"/>
-        </Style>
-    </Window.Resources>
+    <!-- Fluent theme is applied via ThemeMode in code-behind (PowerShell 7.5+ / .NET 9) -->
+    <!-- No custom styles needed - using default Fluent theme styles -->
 
     <Grid>
         <Grid.RowDefinitions>
@@ -70,8 +18,8 @@
         </Grid.RowDefinitions>
 
         <!-- Menu Bar -->
-        <Menu Grid.Row="0" Background="#2D2D2D" Foreground="White">
-            <MenuItem Header="_File" Foreground="White">
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
                 <MenuItem x:Name="MenuNew" Header="_New Report" InputGestureText="Ctrl+N"/>
                 <MenuItem x:Name="MenuOpen" Header="_Open..." InputGestureText="Ctrl+O"/>
                 <MenuItem x:Name="MenuSave" Header="_Save" InputGestureText="Ctrl+S"/>
@@ -82,36 +30,36 @@
                 <Separator/>
                 <MenuItem x:Name="MenuExit" Header="E_xit" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="_Edit" Foreground="White">
+            <MenuItem Header="_Edit">
                 <MenuItem x:Name="MenuUndo" Header="_Undo" InputGestureText="Ctrl+Z"/>
                 <MenuItem x:Name="MenuRedo" Header="_Redo" InputGestureText="Ctrl+Y"/>
             </MenuItem>
-            <MenuItem Header="_Data" Foreground="White">
+            <MenuItem Header="_Data">
                 <MenuItem x:Name="MenuAddDataSource" Header="_Add Data Source"/>
                 <MenuItem x:Name="MenuManageDataSources" Header="_Manage Data Sources"/>
                 <Separator/>
                 <MenuItem x:Name="MenuRefreshData" Header="_Refresh Data"/>
             </MenuItem>
-            <MenuItem Header="_View" Foreground="White">
+            <MenuItem Header="_View">
                 <MenuItem x:Name="MenuPreview" Header="_Preview Report" InputGestureText="F5"/>
                 <MenuItem x:Name="MenuShowCode" Header="Show Generated _Code"/>
             </MenuItem>
-            <MenuItem Header="_Help" Foreground="White">
+            <MenuItem Header="_Help">
                 <MenuItem x:Name="MenuHelp" Header="_Documentation"/>
                 <MenuItem x:Name="MenuAbout" Header="_About"/>
             </MenuItem>
         </Menu>
 
         <!-- Toolbar -->
-        <ToolBar Grid.Row="1" Background="#2D2D2D">
-            <Button x:Name="BtnNew" Style="{StaticResource DarkButton}" ToolTip="New Report">📄 New</Button>
-            <Button x:Name="BtnOpen" Style="{StaticResource DarkButton}" ToolTip="Open">📂 Open</Button>
-            <Button x:Name="BtnSave" Style="{StaticResource DarkButton}" ToolTip="Save">💾 Save</Button>
+        <ToolBar Grid.Row="1">
+            <Button x:Name="BtnNew" ToolTip="New Report" Padding="10,5" Margin="2">📄 New</Button>
+            <Button x:Name="BtnOpen" ToolTip="Open" Padding="10,5" Margin="2">📂 Open</Button>
+            <Button x:Name="BtnSave" ToolTip="Save" Padding="10,5" Margin="2">💾 Save</Button>
             <Separator/>
-            <Button x:Name="BtnAddDataSource" Style="{StaticResource DarkButton}" ToolTip="Add Data Source">🗃️ Source</Button>
+            <Button x:Name="BtnAddDataSource" ToolTip="Add Data Source" Padding="10,5" Margin="2">🗃️ Source</Button>
             <Separator/>
-            <Button x:Name="BtnPreview" Style="{StaticResource AccentButton}" ToolTip="Preview (F5)">▶️ Preview</Button>
-            <Button x:Name="BtnExportHtml" Style="{StaticResource DarkButton}" ToolTip="Export HTML">📤 Export</Button>
+            <Button x:Name="BtnPreview" ToolTip="Preview (F5)" Padding="10,5" Margin="2">▶️ Preview</Button>
+            <Button x:Name="BtnExportHtml" ToolTip="Export HTML" Padding="10,5" Margin="2">📤 Export</Button>
         </ToolBar>
 
         <!-- Main Content Area -->
@@ -125,7 +73,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Left Panel - Elements Toolbox & Tree -->
-            <Grid Grid.Column="0" Background="#252526">
+            <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -134,66 +82,46 @@
                 </Grid.RowDefinitions>
 
                 <!-- Elements Toolbox Header -->
-                <Border Grid.Row="0" Background="#3C3C3C" Padding="10">
-                    <TextBlock Text="📦 Elements" Style="{StaticResource SectionHeader}"/>
+                <Border Grid.Row="0" Padding="10">
+                    <TextBlock Text="📦 Elements" FontSize="14" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- Elements Toolbox -->
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel x:Name="ElementsToolbox" Margin="5">
-                        <Button x:Name="BtnAddTab" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">📑 Tab</Button>
-                        <Button x:Name="BtnAddSection" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">📦 Section</Button>
-                        <Button x:Name="BtnAddPanel" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">🗂️ Panel</Button>
-                        <Button x:Name="BtnAddTable" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">📊 Table</Button>
-                        <Button x:Name="BtnAddChart" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">📈 Chart</Button>
-                        <Button x:Name="BtnAddText" Style="{StaticResource DarkButton}" HorizontalAlignment="Stretch">📝 Text</Button>
+                        <Button x:Name="BtnAddTab" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📑 Tab</Button>
+                        <Button x:Name="BtnAddSection" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📦 Section</Button>
+                        <Button x:Name="BtnAddPanel" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">🗂️ Panel</Button>
+                        <Button x:Name="BtnAddTable" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📊 Table</Button>
+                        <Button x:Name="BtnAddChart" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📈 Chart</Button>
+                        <Button x:Name="BtnAddText" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📝 Text</Button>
                     </StackPanel>
                 </ScrollViewer>
 
                 <!-- Report Structure Header -->
-                <Border Grid.Row="2" Background="#3C3C3C" Padding="10">
-                    <TextBlock Text="🏗️ Report Structure" Style="{StaticResource SectionHeader}"/>
+                <Border Grid.Row="2" Padding="10">
+                    <TextBlock Text="🏗️ Report Structure" FontSize="14" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- Report Structure Tree -->
-                <TreeView x:Name="ReportTreeView" Grid.Row="3" Background="#252526" Foreground="White" BorderThickness="0" Margin="5">
-                    <TreeView.Resources>
-                        <Style TargetType="TreeViewItem">
-                            <Setter Property="Foreground" Value="White"/>
-                        </Style>
-                    </TreeView.Resources>
-                </TreeView>
+                <TreeView x:Name="ReportTreeView" Grid.Row="3" BorderThickness="0" Margin="5"/>
             </Grid>
 
             <!-- Left Splitter -->
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="#3C3C3C"/>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
 
             <!-- Center Panel - Visual Designer / Preview -->
-            <Grid Grid.Column="2" Background="#1E1E1E">
+            <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
                 <!-- Tab Control for Designer/Preview/Code -->
-                <TabControl Grid.Row="0" Grid.RowSpan="2" x:Name="MainTabControl" Background="#1E1E1E" BorderThickness="0">
-                    <TabControl.Resources>
-                        <Style TargetType="TabItem">
-                            <Setter Property="Background" Value="#2D2D2D"/>
-                            <Setter Property="Foreground" Value="#CCCCCC"/>
-                            <Setter Property="Padding" Value="15,8"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="#3C3C3C"/>
-                                    <Setter Property="Foreground" Value="White"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TabControl.Resources>
-
+                <TabControl Grid.Row="0" Grid.RowSpan="2" x:Name="MainTabControl" BorderThickness="0">
                     <!-- Designer Tab -->
                     <TabItem Header="🎨 Designer">
-                        <Grid Background="#1E1E1E">
+                        <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -201,15 +129,15 @@
 
                             <!-- Report Title -->
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                                <Label Content="Report Title:" Style="{StaticResource DarkLabel}"/>
-                                <TextBox x:Name="TxtReportTitle" Style="{StaticResource DarkTextBox}" Width="300" Text="New Report"/>
+                                <Label Content="Report Title:"/>
+                                <TextBox x:Name="TxtReportTitle" Width="300" Padding="5" Margin="2" Text="New Report"/>
                             </StackPanel>
 
                             <!-- Design Canvas -->
-                            <Border Grid.Row="1" Background="#2D2D2D" Margin="10" CornerRadius="5">
+                            <Border Grid.Row="1" Margin="10" CornerRadius="5" BorderThickness="1" BorderBrush="Gray">
                                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <Canvas x:Name="DesignCanvas" Background="#2D2D2D" Width="800" Height="600">
-                                        <TextBlock Canvas.Left="300" Canvas.Top="280" Text="Drag elements here" Foreground="#666666" FontSize="16"/>
+                                    <Canvas x:Name="DesignCanvas" Width="800" Height="600">
+                                        <TextBlock Canvas.Left="300" Canvas.Top="280" Text="Drag elements here" Foreground="Gray" FontSize="16"/>
                                     </Canvas>
                                 </ScrollViewer>
                             </Border>
@@ -218,17 +146,15 @@
 
                     <!-- Preview Tab -->
                     <TabItem Header="👁️ Preview">
-                        <Grid Background="#FFFFFF">
+                        <Grid>
                             <WebBrowser x:Name="PreviewBrowser"/>
                         </Grid>
                     </TabItem>
 
                     <!-- Code Tab -->
                     <TabItem Header="💻 Generated Code">
-                        <Grid Background="#1E1E1E">
+                        <Grid>
                             <TextBox x:Name="TxtGeneratedCode"
-                                     Background="#1E1E1E"
-                                     Foreground="#D4D4D4"
                                      FontFamily="Consolas"
                                      FontSize="12"
                                      IsReadOnly="True"
@@ -244,10 +170,10 @@
             </Grid>
 
             <!-- Right Splitter -->
-            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="#3C3C3C"/>
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
 
             <!-- Right Panel - Properties -->
-            <Grid Grid.Column="4" Background="#252526">
+            <Grid Grid.Column="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -256,20 +182,20 @@
                 </Grid.RowDefinitions>
 
                 <!-- Properties Header -->
-                <Border Grid.Row="0" Background="#3C3C3C" Padding="10">
-                    <TextBlock Text="⚙️ Properties" Style="{StaticResource SectionHeader}"/>
+                <Border Grid.Row="0" Padding="10">
+                    <TextBlock Text="⚙️ Properties" FontSize="14" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- Properties Panel -->
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel x:Name="PropertiesPanel" Margin="10">
-                        <TextBlock Text="Select an element to view its properties" Foreground="#666666" TextWrapping="Wrap"/>
+                        <TextBlock Text="Select an element to view its properties" Foreground="Gray" TextWrapping="Wrap"/>
                     </StackPanel>
                 </ScrollViewer>
 
                 <!-- Data Sources Header -->
-                <Border Grid.Row="2" Background="#3C3C3C" Padding="10">
-                    <TextBlock Text="🗃️ Data Sources" Style="{StaticResource SectionHeader}"/>
+                <Border Grid.Row="2" Padding="10">
+                    <TextBlock Text="🗃️ Data Sources" FontSize="14" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- Data Sources List -->
@@ -279,7 +205,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <ListBox x:Name="DataSourcesList" Grid.Row="0" Background="#252526" Foreground="White" BorderThickness="0" Margin="5">
+                    <ListBox x:Name="DataSourcesList" Grid.Row="0" BorderThickness="0" Margin="5">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -291,21 +217,21 @@
                     </ListBox>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                        <Button x:Name="BtnAddDataSourcePanel" Style="{StaticResource DarkButton}" Content="➕"/>
-                        <Button x:Name="BtnEditDataSource" Style="{StaticResource DarkButton}" Content="✏️"/>
-                        <Button x:Name="BtnRemoveDataSource" Style="{StaticResource DarkButton}" Content="🗑️"/>
+                        <Button x:Name="BtnAddDataSourcePanel" Content="➕" Padding="10,5" Margin="2"/>
+                        <Button x:Name="BtnEditDataSource" Content="✏️" Padding="10,5" Margin="2"/>
+                        <Button x:Name="BtnRemoveDataSource" Content="🗑️" Padding="10,5" Margin="2"/>
                     </StackPanel>
                 </Grid>
             </Grid>
         </Grid>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="3" Background="#007ACC">
+        <StatusBar Grid.Row="3">
             <StatusBarItem>
-                <TextBlock x:Name="StatusText" Text="Ready" Foreground="White"/>
+                <TextBlock x:Name="StatusText" Text="Ready"/>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock x:Name="StatusElements" Text="Elements: 0" Foreground="White"/>
+                <TextBlock x:Name="StatusElements" Text="Elements: 0"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
