@@ -16,7 +16,24 @@ Write-Output "> Downloading PSReportBuilder..."
 
 # Download latest version of PSReportBuilder from GitHub as zip archive
 try {
-    $LatestReleaseUri = (Invoke-RestMethod https://api.github.com/repos/mchave3/PSReportBuilder/releases/latest).zipball_url
+    $gitHubApiHeaders = @{
+        "Accept"     = "application/vnd.github+json"
+        "User-Agent" = "PSReportBuilder-Get.ps1"
+    }
+
+    $latestRelease = Invoke-RestMethod -Uri "https://api.github.com/repos/mchave3/PSReportBuilder/releases/latest" -Headers $gitHubApiHeaders
+    if (-not $latestRelease.zipball_url) {
+        throw "GitHub API response did not include zipball_url"
+    }
+
+    if ($latestRelease.tag_name) {
+        Write-Output ("> Latest release: {0}" -f $latestRelease.tag_name)
+    }
+    if ($latestRelease.html_url) {
+        Write-Output ("> Release page: {0}" -f $latestRelease.html_url)
+    }
+
+    $LatestReleaseUri = $latestRelease.zipball_url
     $zipPath = Join-Path $env:TEMP "PSReportBuilder.zip"
     Invoke-RestMethod $LatestReleaseUri -OutFile $zipPath
 
@@ -31,6 +48,9 @@ try {
     }
 
     Write-Output "> Downloaded successfully ($([math]::Round($fileInfo.Length/1MB, 2)) MB)"
+
+    $zipHash = Get-FileHash -Path $zipPath -Algorithm SHA256 -ErrorAction Stop
+    Write-Output ("> Download SHA256: {0}" -f $zipHash.Hash)
 }
 catch {
     Write-Host "Error: Unable to fetch latest release from GitHub. Please check your internet connection and try again." -ForegroundColor Red
@@ -111,6 +131,18 @@ if (-not (Test-Path $mainScriptPath)) {
 Write-Host "WARNING: " -ForegroundColor Yellow -NoNewline
 Write-Host "This script will request administrator privileges to run PSReportBuilder."
 Write-Output ""
+
+try {
+    $signature = Get-AuthenticodeSignature -FilePath $mainScriptPath -ErrorAction Stop
+    Write-Output ("> Script signature: {0}" -f $signature.Status)
+    if ($signature.Status -ne "Valid") {
+        Write-Host "WARNING: " -ForegroundColor Yellow -NoNewline
+        Write-Host "PSReportBuilder.ps1 is not Authenticode-signed with a valid signature. Only continue if you trust the source."
+    }
+}
+catch {
+    Write-Host "Warning: Unable to check Authenticode signature ($($_.Exception.Message))" -ForegroundColor Yellow
+}
 
 # Run PSReportBuilder script with the provided arguments
 try {
