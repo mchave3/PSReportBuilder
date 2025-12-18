@@ -17,14 +17,15 @@ Write-Output "> Downloading PSReportBuilder..."
 # Download latest version of PSReportBuilder from GitHub as zip archive
 try {
     $LatestReleaseUri = (Invoke-RestMethod https://api.github.com/repos/mchave3/PSReportBuilder/releases/latest).zipball_url
-    Invoke-RestMethod $LatestReleaseUri -OutFile "$env:TEMP/PSReportBuilder.zip"
+    $zipPath = Join-Path $env:TEMP "PSReportBuilder.zip"
+    Invoke-RestMethod $LatestReleaseUri -OutFile $zipPath
 
     # Validate downloaded file exists and has valid size
-    if (-not (Test-Path "$env:TEMP/PSReportBuilder.zip")) {
+    if (-not (Test-Path $zipPath)) {
         throw "Downloaded file not found"
     }
 
-    $fileInfo = Get-Item "$env:TEMP/PSReportBuilder.zip"
+    $fileInfo = Get-Item $zipPath
     if ($fileInfo.Length -lt 1KB) {
         throw "Downloaded file is too small (possibly corrupted)"
     }
@@ -54,7 +55,8 @@ Write-Output "> Unpacking..."
 
 # Unzip archive to PSReportBuilder folder
 try {
-    Expand-Archive "$env:TEMP/PSReportBuilder.zip" "$env:TEMP/PSReportBuilder" -Force -ErrorAction Stop
+    $extractRoot = Join-Path $env:TEMP "PSReportBuilder"
+    Expand-Archive $zipPath $extractRoot -Force -ErrorAction Stop
 }
 catch {
     Write-Host "Error: Failed to extract archive" -ForegroundColor Red
@@ -66,17 +68,18 @@ catch {
 }
 
 # Remove archive
-Remove-Item "$env:TEMP/PSReportBuilder.zip" -ErrorAction SilentlyContinue
+Remove-Item $zipPath -ErrorAction SilentlyContinue
 
 # Move files
 try {
-    $extractedFolder = Get-ChildItem -Path "$env:TEMP/PSReportBuilder/mchave3-PSReportBuilder-*" -Directory -ErrorAction Stop
+    $extractedFolder = Get-ChildItem -Path (Join-Path $extractRoot "mchave3-PSReportBuilder-*") -Directory -ErrorAction Stop
 
     if (-not $extractedFolder) {
         throw "Extracted folder not found. Archive structure may have changed."
     }
 
-    Get-ChildItem -Path $extractedFolder.FullName -Recurse | Move-Item -Destination "$env:TEMP/PSReportBuilder" -Force -ErrorAction Stop
+    # Copy the extracted repository contents into the root folder without flattening the tree
+    Copy-Item -Path (Join-Path $extractedFolder.FullName "*") -Destination $extractRoot -Recurse -Force -ErrorAction Stop
     Remove-Item -Path $extractedFolder.FullName -Recurse -Force -ErrorAction SilentlyContinue
 }
 catch {
@@ -88,21 +91,15 @@ catch {
     Exit
 }
 
-# Make list of arguments to pass on to the script
-$arguments = $($PSBoundParameters.GetEnumerator() | ForEach-Object {
-    if ($_.Value -eq $true) {
-        "-$($_.Key)"
-    }
-    else {
-         "-$($_.Key) ""$($_.Value)"""
-    }
-})
+# Forward arguments passed to Get.ps1 to PSReportBuilder.ps1
+$forwardedArguments = @($args)
 
 Write-Output ""
 Write-Output "> Running PSReportBuilder..."
 
 # Validate main script exists before running
-if (-not (Test-Path "$env:TEMP\PSReportBuilder\PSReportBuilder.ps1")) {
+$mainScriptPath = Join-Path $extractRoot "PSReportBuilder.ps1"
+if (-not (Test-Path $mainScriptPath)) {
     Write-Host "Error: PSReportBuilder.ps1 not found in extracted files" -ForegroundColor Red
     Write-Output ""
     Write-Output "Press enter to exit..."
@@ -117,7 +114,13 @@ Write-Output ""
 
 # Run PSReportBuilder script with the provided arguments
 try {
-    $PSReportBuilderProcess = Start-Process powershell.exe -PassThru -ArgumentList "-executionpolicy bypass -File $env:TEMP\PSReportBuilder\PSReportBuilder.ps1 $arguments" -Verb RunAs -ErrorAction Stop
+    $argumentList = @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", $mainScriptPath
+    ) + $forwardedArguments
+
+    $PSReportBuilderProcess = Start-Process powershell.exe -PassThru -ArgumentList $argumentList -Verb RunAs -ErrorAction Stop
 
     # Wait for the process to finish before continuing
     if ($null -ne $PSReportBuilderProcess) {
