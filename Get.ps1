@@ -3,8 +3,8 @@ function Pause-Exit {
         [int] $ExitCode = 1
     )
 
-    Write-Output ""
-    Write-Output "Press enter to exit..."
+    Write-Host ""
+    Write-Host "Press enter to exit..."
     Read-Host | Out-Null
     exit $ExitCode
 }
@@ -23,11 +23,11 @@ try {
 }
 catch {
 }
-Write-Output "-------------------------------------------------------------------------------------------"
-Write-Output " PSReportBuilder Script - Get"
-Write-Output "-------------------------------------------------------------------------------------------"
-Write-Output ""
-Write-Output "> Downloading PSReportBuilder..."
+Write-Host "-------------------------------------------------------------------------------------------"
+Write-Host " PSReportBuilder Script - Get"
+Write-Host "-------------------------------------------------------------------------------------------"
+Write-Host ""
+Write-Host "> Downloading PSReportBuilder..." -ForegroundColor Cyan
 
 # Download latest version of PSReportBuilder from GitHub as zip archive
 try {
@@ -42,10 +42,10 @@ try {
     }
 
     if ($latestRelease.tag_name) {
-        Write-Output ("> Latest release: {0}" -f $latestRelease.tag_name)
+        Write-Host ("> Latest release: {0}" -f $latestRelease.tag_name)
     }
     if ($latestRelease.html_url) {
-        Write-Output ("> Release page: {0}" -f $latestRelease.html_url)
+        Write-Host ("> Release page: {0}" -f $latestRelease.html_url)
     }
 
     Invoke-RestMethod -Uri $latestRelease.zipball_url -OutFile $zipPath
@@ -60,10 +60,10 @@ try {
         throw "Downloaded file is too small (possibly corrupted)"
     }
 
-    Write-Output "> Downloaded successfully ($([math]::Round($fileInfo.Length / 1MB, 2)) MB)"
+    Write-Host "> Downloaded successfully ($([math]::Round($fileInfo.Length / 1MB, 2)) MB)"
 
     $zipHash = Get-FileHash -Path $zipPath -Algorithm SHA256 -ErrorAction Stop
-    Write-Output ("> Download SHA256: {0}" -f $zipHash.Hash)
+    Write-Host ("> Download SHA256: {0}" -f $zipHash.Hash)
 }
 catch {
     Write-Host "Error: Unable to fetch latest release from GitHub. Please check your internet connection and try again." -ForegroundColor Red
@@ -75,13 +75,13 @@ catch {
 
 # Remove old script folder if it exists, except for CustomAppsList and SavedSettings files
 if (Test-Path -LiteralPath $extractRoot) {
-    Write-Output ""
-    Write-Output "> Cleaning up old PSReportBuilder folder..."
+    Write-Host ""
+    Write-Host "> Cleaning up old PSReportBuilder folder..." -ForegroundColor Cyan
     Get-ChildItem -Path $extractRoot -Exclude CustomAppsList, SavedSettings, PSReportBuilder.log | Remove-Item -Recurse -Force
 }
 
-Write-Output ""
-Write-Output "> Unpacking..."
+Write-Host ""
+Write-Host "> Unpacking..." -ForegroundColor Cyan
 
 # Unzip archive to PSReportBuilder folder
 try {
@@ -117,8 +117,8 @@ catch {
 # Forward arguments passed to Get.ps1 to PSReportBuilder.ps1
 $forwardedArguments = @($args)
 
-Write-Output ""
-Write-Output "> Running PSReportBuilder..."
+Write-Host ""
+Write-Host "> Running PSReportBuilder..." -ForegroundColor Cyan
 
 # Validate main script exists before running
 $mainScriptPath = Join-Path $extractRoot "PSReportBuilder.ps1"
@@ -130,11 +130,11 @@ if (-not (Test-Path -LiteralPath $mainScriptPath)) {
 # Security warning for privilege elevation
 Write-Host "WARNING: " -ForegroundColor Yellow -NoNewline
 Write-Host "This script will request administrator privileges to run PSReportBuilder."
-Write-Output ""
+Write-Host ""
 
 try {
     $signature = Get-AuthenticodeSignature -FilePath $mainScriptPath -ErrorAction Stop
-    Write-Output ("> Script signature: {0}" -f $signature.Status)
+    Write-Host ("> Script signature: {0}" -f $signature.Status)
 
     if ($signature.Status -ne "Valid") {
         Write-Host "WARNING: " -ForegroundColor Yellow -NoNewline
@@ -171,10 +171,10 @@ catch {
 
 # Remove all remaining script files, except for CustomAppsList and SavedSettings files
 if (Test-Path -LiteralPath $extractRoot) {
-    Write-Output ""
-    Write-Output "> Cleaning up..."
+    Write-Host ""
+    Write-Host "> Cleaning up..." -ForegroundColor Cyan
 
     Get-ChildItem -Path $extractRoot -Exclude CustomAppsList, SavedSettings, PSReportBuilder.log | Remove-Item -Recurse -Force
 }
 
-Write-Output ""
+Write-Host ""
