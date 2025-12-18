@@ -1,3 +1,18 @@
+<#
+.SYNOPSIS
+    Downloads the latest version of PSReportBuilder from GitHub, unpacks it, and runs
+
+.DESCRIPTION
+    This script fetches the latest release of PSReportBuilder from its GitHub repository,
+    extracts the contents to a temporary folder, and launches PSReportBuilder.ps1 with
+    administrator privileges. It also cleans up old files and handles errors gracefully.
+
+.NOTES
+    Author: Mickaël CHAVE
+    GitHub: https://github.com/mchave3/PSReportBuilder
+    License: MIT License
+#>
+
 function Pause-Exit {
     param(
         [int] $ExitCode = 1
