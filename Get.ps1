@@ -13,7 +13,7 @@
     License: MIT License
 #>
 
-function Pause-Exit {
+function AwaitForExit {
     param(
         [int] $ExitCode = 1
     )
@@ -30,7 +30,7 @@ $extractRoot = Join-Path $env:TEMP "PSReportBuilder"
 # Show error if current powershell environment does not have LanguageMode set to FullLanguage
 if ($ExecutionContext.SessionState.LanguageMode -ne "FullLanguage") {
     Write-Host "Error: PSReportBuilder is unable to run on your system. PowerShell execution is restricted by security policies" -ForegroundColor Red
-    Pause-Exit
+    AwaitForExit
 }
 
 try {
@@ -39,7 +39,7 @@ try {
 catch {
 }
 Write-Host "-------------------------------------------------------------------------------------------"
-Write-Host " PSReportBuilder Script - Get"
+Write-Host " PSReportBuilder - Get"
 Write-Host "-------------------------------------------------------------------------------------------"
 Write-Host ""
 Write-Host "> Downloading PSReportBuilder..." -ForegroundColor Cyan
@@ -85,7 +85,7 @@ catch {
     if ($_.Exception.Message) {
         Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
     }
-    Pause-Exit
+    AwaitForExit
 }
 
 # Remove old script folder if it exists, except for CustomAppsList and SavedSettings files
@@ -105,7 +105,7 @@ try {
 catch {
     Write-Host "Error: Failed to extract archive" -ForegroundColor Red
     Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-Exit
+    AwaitForExit
 }
 finally {
     # Remove archive
@@ -126,7 +126,7 @@ try {
 catch {
     Write-Host "Error: Failed to move extracted files" -ForegroundColor Red
     Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-Exit
+    AwaitForExit
 }
 
 # Forward arguments passed to Get.ps1 to PSReportBuilder.ps1
@@ -139,7 +139,7 @@ Write-Host "> Running PSReportBuilder..." -ForegroundColor Cyan
 $mainScriptPath = Join-Path $extractRoot "PSReportBuilder.ps1"
 if (-not (Test-Path -LiteralPath $mainScriptPath)) {
     Write-Host "Error: PSReportBuilder.ps1 not found in extracted files" -ForegroundColor Red
-    Pause-Exit
+    AwaitForExit
 }
 
 # Security warning for privilege elevation
@@ -181,7 +181,7 @@ try {
 catch {
     Write-Host "Error: Failed to start PSReportBuilder" -ForegroundColor Red
     Write-Host "Details: $($_.Exception.Message)" -ForegroundColor Red
-    Pause-Exit
+    AwaitForExit
 }
 
 # Remove all remaining script files, except for CustomAppsList and SavedSettings files
