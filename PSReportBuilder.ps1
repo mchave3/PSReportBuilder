@@ -18,7 +18,7 @@
     Launches the Report Builder graphical interface
 
 .NOTES
-    Author: PSReportBuilder Team
+    Author: Mickaël CHAVE
     Version: 1.0.0
 #>
 
