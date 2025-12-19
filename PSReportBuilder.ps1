@@ -333,6 +333,325 @@ function Update-GeneratedCode {
     }
 }
 
+# Function to expand/collapse TreeViewItem recursively
+function Expand-TreeViewItem {
+    param(
+        [System.Windows.Controls.TreeViewItem]$Item,
+        [bool]$Expand
+    )
+
+    $Item.IsExpanded = $Expand
+    foreach ($child in $Item.Items) {
+        if ($child -is [System.Windows.Controls.TreeViewItem]) {
+            Expand-TreeViewItem -Item $child -Expand $Expand
+        }
+    }
+}
+
+# Function to move element up or down in report structure
+function Move-ReportElement {
+    param(
+        [object]$Report,
+        [object]$Element,
+        [ValidateSet("Up", "Down")]
+        [string]$Direction
+    )
+
+    # Find element in root or in parent's children
+    $parent = Find-ElementParent -Report $Report -Element $Element
+
+    if ($null -eq $parent) {
+        # Element is at root level
+        $list = $Report.Elements
+    }
+    else {
+        $list = $parent.Children
+    }
+
+    $index = -1
+    for ($i = 0; $i -lt $list.Count; $i++) {
+        if ($list[$i].Id -eq $Element.Id) {
+            $index = $i
+            break
+        }
+    }
+
+    if ($index -eq -1) {
+        return $false
+    }
+
+    $newIndex = if ($Direction -eq "Up") { $index - 1 } else { $index + 1 }
+
+    if ($newIndex -lt 0 -or $newIndex -ge $list.Count) {
+        return $false
+    }
+
+    # Swap elements
+    $temp = $list[$index]
+    $list[$index] = $list[$newIndex]
+    $list[$newIndex] = $temp
+
+    return $true
+}
+
+# Function to find parent of an element
+function Find-ElementParent {
+    param(
+        [object]$Report,
+        [object]$Element
+    )
+
+    foreach ($rootElement in $Report.Elements) {
+        if ($rootElement.Id -eq $Element.Id) {
+            return $null  # Element is at root
+        }
+        $parent = Find-ElementParentRecursive -Parent $rootElement -Element $Element
+        if ($null -ne $parent) {
+            return $parent
+        }
+    }
+    return $null
+}
+
+function Find-ElementParentRecursive {
+    param(
+        [object]$Parent,
+        [object]$Element
+    )
+
+    foreach ($child in $Parent.Children) {
+        if ($child.Id -eq $Element.Id) {
+            return $Parent
+        }
+        $found = Find-ElementParentRecursive -Parent $child -Element $Element
+        if ($null -ne $found) {
+            return $found
+        }
+    }
+    return $null
+}
+
+# Function to remove element from report
+function Remove-ReportElement {
+    param(
+        [object]$Report,
+        [object]$Element
+    )
+
+    # Try to remove from root
+    for ($i = 0; $i -lt $Report.Elements.Count; $i++) {
+        if ($Report.Elements[$i].Id -eq $Element.Id) {
+            $Report.Elements.RemoveAt($i)
+            return $true
+        }
+    }
+
+    # Try to remove from children recursively
+    foreach ($rootElement in $Report.Elements) {
+        if (Remove-ElementFromChildren -Parent $rootElement -Element $Element) {
+            return $true
+        }
+    }
+    return $false
+}
+
+function Remove-ElementFromChildren {
+    param(
+        [object]$Parent,
+        [object]$Element
+    )
+
+    for ($i = 0; $i -lt $Parent.Children.Count; $i++) {
+        if ($Parent.Children[$i].Id -eq $Element.Id) {
+            $Parent.Children.RemoveAt($i)
+            return $true
+        }
+        if (Remove-ElementFromChildren -Parent $Parent.Children[$i] -Element $Element) {
+            return $true
+        }
+    }
+    return $false
+}
+
+# Function to update properties panel
+function Update-PropertiesPanel {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel,
+        [object]$Element
+    )
+
+    $Panel.Children.Clear()
+
+    # Name property
+    $nameLabel = New-Object System.Windows.Controls.Label
+    $nameLabel.Content = "Name:"
+    $Panel.Children.Add($nameLabel) | Out-Null
+
+    $nameTextBox = New-Object System.Windows.Controls.TextBox
+    $nameTextBox.Text = $Element.Name
+    $nameTextBox.Padding = "5"
+    $nameTextBox.Margin = "0,0,0,10"
+    $nameTextBox.Tag = $Element
+    $nameTextBox.Add_TextChanged({
+        param($sender, $e)
+        $sender.Tag.Name = $sender.Text
+    })
+    $Panel.Children.Add($nameTextBox) | Out-Null
+
+    # Type (read-only)
+    $typeLabel = New-Object System.Windows.Controls.Label
+    $typeLabel.Content = "Type:"
+    $Panel.Children.Add($typeLabel) | Out-Null
+
+    $typeTextBox = New-Object System.Windows.Controls.TextBox
+    $typeTextBox.Text = $Element.Type
+    $typeTextBox.IsReadOnly = $true
+    $typeTextBox.Padding = "5"
+    $typeTextBox.Margin = "0,0,0,10"
+    $typeTextBox.Background = [System.Windows.Media.Brushes]::LightGray
+    $Panel.Children.Add($typeTextBox) | Out-Null
+
+    # Add type-specific properties
+    switch ($Element.Type) {
+        "Table" {
+            Add-TableProperties -Panel $Panel -Element $Element
+        }
+        "Chart" {
+            Add-ChartProperties -Panel $Panel -Element $Element
+        }
+        "Text" {
+            Add-TextProperties -Panel $Panel -Element $Element
+        }
+        "Section" {
+            Add-SectionProperties -Panel $Panel -Element $Element
+        }
+    }
+}
+
+# Function to clear properties panel
+function Clear-PropertiesPanel {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel
+    )
+
+    $Panel.Children.Clear()
+
+    $placeholder = New-Object System.Windows.Controls.TextBlock
+    $placeholder.Text = "Select an element to view and edit its properties"
+    $placeholder.Foreground = [System.Windows.Media.Brushes]::Gray
+    $placeholder.TextWrapping = [System.Windows.TextWrapping]::Wrap
+    $Panel.Children.Add($placeholder) | Out-Null
+}
+
+# Function to add table-specific properties
+function Add-TableProperties {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel,
+        [object]$Element
+    )
+
+    $dsLabel = New-Object System.Windows.Controls.Label
+    $dsLabel.Content = "Data Source:"
+    $Panel.Children.Add($dsLabel) | Out-Null
+
+    $dsCombo = New-Object System.Windows.Controls.ComboBox
+    $dsCombo.Padding = "5"
+    $dsCombo.Margin = "0,0,0,10"
+
+    $dataSources = Get-DataSources
+    foreach ($ds in $dataSources) {
+        $dsCombo.Items.Add($ds.Name) | Out-Null
+    }
+    if ($Element.Properties.DataSource) {
+        $dsCombo.SelectedItem = $Element.Properties.DataSource
+    }
+    $dsCombo.Tag = $Element
+    $dsCombo.Add_SelectionChanged({
+        param($sender, $e)
+        $sender.Tag.Properties.DataSource = $sender.SelectedItem
+    })
+    $Panel.Children.Add($dsCombo) | Out-Null
+}
+
+# Function to add chart-specific properties
+function Add-ChartProperties {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel,
+        [object]$Element
+    )
+
+    $chartTypeLabel = New-Object System.Windows.Controls.Label
+    $chartTypeLabel.Content = "Chart Type:"
+    $Panel.Children.Add($chartTypeLabel) | Out-Null
+
+    $chartTypeCombo = New-Object System.Windows.Controls.ComboBox
+    $chartTypeCombo.Padding = "5"
+    $chartTypeCombo.Margin = "0,0,0,10"
+    @("Bar", "Line", "Pie", "Doughnut", "Area") | ForEach-Object { $chartTypeCombo.Items.Add($_) | Out-Null }
+    if ($Element.Properties.ChartType) {
+        $chartTypeCombo.SelectedItem = $Element.Properties.ChartType
+    }
+    $chartTypeCombo.Tag = $Element
+    $chartTypeCombo.Add_SelectionChanged({
+        param($sender, $e)
+        $sender.Tag.Properties.ChartType = $sender.SelectedItem
+    })
+    $Panel.Children.Add($chartTypeCombo) | Out-Null
+}
+
+# Function to add text-specific properties
+function Add-TextProperties {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel,
+        [object]$Element
+    )
+
+    $contentLabel = New-Object System.Windows.Controls.Label
+    $contentLabel.Content = "Content:"
+    $Panel.Children.Add($contentLabel) | Out-Null
+
+    $contentTextBox = New-Object System.Windows.Controls.TextBox
+    $contentTextBox.Text = $Element.Properties.Content
+    $contentTextBox.AcceptsReturn = $true
+    $contentTextBox.TextWrapping = [System.Windows.TextWrapping]::Wrap
+    $contentTextBox.Height = 100
+    $contentTextBox.Padding = "5"
+    $contentTextBox.Margin = "0,0,0,10"
+    $contentTextBox.VerticalScrollBarVisibility = [System.Windows.Controls.ScrollBarVisibility]::Auto
+    $contentTextBox.Tag = $Element
+    $contentTextBox.Add_TextChanged({
+        param($sender, $e)
+        $sender.Tag.Properties.Content = $sender.Text
+    })
+    $Panel.Children.Add($contentTextBox) | Out-Null
+}
+
+# Function to add section-specific properties
+function Add-SectionProperties {
+    param(
+        [System.Windows.Controls.StackPanel]$Panel,
+        [object]$Element
+    )
+
+    $collapsibleLabel = New-Object System.Windows.Controls.Label
+    $collapsibleLabel.Content = "Collapsible:"
+    $Panel.Children.Add($collapsibleLabel) | Out-Null
+
+    $collapsibleCheck = New-Object System.Windows.Controls.CheckBox
+    $collapsibleCheck.IsChecked = $Element.Properties.Collapsible
+    $collapsibleCheck.Margin = "0,0,0,10"
+    $collapsibleCheck.Tag = $Element
+    $collapsibleCheck.Add_Checked({
+        param($sender, $e)
+        $sender.Tag.Properties.Collapsible = $true
+    })
+    $collapsibleCheck.Add_Unchecked({
+        param($sender, $e)
+        $sender.Tag.Properties.Collapsible = $false
+    })
+    $Panel.Children.Add($collapsibleCheck) | Out-Null
+}
+
 # Function to show data source dialog
 function Show-DataSourceDialog {
     param(
@@ -511,6 +830,21 @@ try {
     $btnAddChart = Get-WPFControl -Window $mainWindow -Name "BtnAddChart"
     $btnAddText = Get-WPFControl -Window $mainWindow -Name "BtnAddText"
 
+    # Structure management buttons
+    $btnMoveUp = Get-WPFControl -Window $mainWindow -Name "BtnMoveUp"
+    $btnMoveDown = Get-WPFControl -Window $mainWindow -Name "BtnMoveDown"
+    $btnDeleteElement = Get-WPFControl -Window $mainWindow -Name "BtnDeleteElement"
+    $btnExpandAll = Get-WPFControl -Window $mainWindow -Name "BtnExpandAll"
+    $btnCollapseAll = Get-WPFControl -Window $mainWindow -Name "BtnCollapseAll"
+
+    # Data source management buttons
+    $btnEditDataSource = Get-WPFControl -Window $mainWindow -Name "BtnEditDataSource"
+    $btnRemoveDataSource = Get-WPFControl -Window $mainWindow -Name "BtnRemoveDataSource"
+
+    # Selected element label
+    $txtSelectedElement = Get-WPFControl -Window $mainWindow -Name "TxtSelectedElement"
+    $propertiesPanel = Get-WPFControl -Window $mainWindow -Name "PropertiesPanel"
+
     # Initialize with new report
     $Script:CurrentReport = New-Report -Title "New Report"
     Update-StatusBar -StatusText $statusText -StatusElements $statusElements -Message "Ready" -Report $Script:CurrentReport
@@ -638,6 +972,132 @@ try {
     $btnAddTable.Add_Click({ Add-ReportElement -Type "Table" -DefaultName "New Table" })
     $btnAddChart.Add_Click({ Add-ReportElement -Type "Chart" -DefaultName "New Chart" })
     $btnAddText.Add_Click({ Add-ReportElement -Type "Text" -DefaultName "New Text" })
+
+    # TreeView selection changed - update properties panel
+    $treeView.Add_SelectedItemChanged({
+        $selectedItem = $treeView.SelectedItem
+        if ($null -ne $selectedItem -and $null -ne $selectedItem.Tag) {
+            $element = $selectedItem.Tag
+            $elementTypes = Get-ReportElementTypes
+            $typeInfo = $elementTypes[$element.Type]
+            $icon = if ($typeInfo) { $typeInfo.Icon } else { "📄" }
+            $txtSelectedElement.Text = "$icon $($element.Name) ($($element.Type))"
+
+            # Update properties panel
+            Update-PropertiesPanel -Panel $propertiesPanel -Element $element
+        }
+        else {
+            $txtSelectedElement.Text = "No element selected"
+            Clear-PropertiesPanel -Panel $propertiesPanel
+        }
+    })
+
+    # Move Up button
+    $btnMoveUp.Add_Click({
+        $selectedItem = $treeView.SelectedItem
+        if ($null -eq $selectedItem -or $null -eq $selectedItem.Tag) {
+            return
+        }
+
+        $element = $selectedItem.Tag
+        $moved = Move-ReportElement -Report $Script:CurrentReport -Element $element -Direction "Up"
+
+        if ($moved) {
+            Update-ReportTreeView -TreeView $treeView -Report $Script:CurrentReport
+            Update-GeneratedCode -CodeTextBox $txtGeneratedCode -Report $Script:CurrentReport
+            Update-StatusBar -StatusText $statusText -StatusElements $statusElements -Message "Element moved up" -Report $Script:CurrentReport
+        }
+    })
+
+    # Move Down button
+    $btnMoveDown.Add_Click({
+        $selectedItem = $treeView.SelectedItem
+        if ($null -eq $selectedItem -or $null -eq $selectedItem.Tag) {
+            return
+        }
+
+        $element = $selectedItem.Tag
+        $moved = Move-ReportElement -Report $Script:CurrentReport -Element $element -Direction "Down"
+
+        if ($moved) {
+            Update-ReportTreeView -TreeView $treeView -Report $Script:CurrentReport
+            Update-GeneratedCode -CodeTextBox $txtGeneratedCode -Report $Script:CurrentReport
+            Update-StatusBar -StatusText $statusText -StatusElements $statusElements -Message "Element moved down" -Report $Script:CurrentReport
+        }
+    })
+
+    # Delete Element button
+    $btnDeleteElement.Add_Click({
+        $selectedItem = $treeView.SelectedItem
+        if ($null -eq $selectedItem -or $null -eq $selectedItem.Tag) {
+            return
+        }
+
+        $element = $selectedItem.Tag
+        $result = [System.Windows.MessageBox]::Show(
+            "Are you sure you want to delete '$($element.Name)'?",
+            "Confirm Delete",
+            [System.Windows.MessageBoxButton]::YesNo,
+            [System.Windows.MessageBoxImage]::Question
+        )
+
+        if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+            Remove-ReportElement -Report $Script:CurrentReport -Element $element
+            Update-ReportTreeView -TreeView $treeView -Report $Script:CurrentReport
+            Update-GeneratedCode -CodeTextBox $txtGeneratedCode -Report $Script:CurrentReport
+            Update-StatusBar -StatusText $statusText -StatusElements $statusElements -Message "Element deleted: $($element.Name)" -Report $Script:CurrentReport
+            $txtSelectedElement.Text = "No element selected"
+            Clear-PropertiesPanel -Panel $propertiesPanel
+        }
+    })
+
+    # Expand All button
+    $btnExpandAll.Add_Click({
+        foreach ($item in $treeView.Items) {
+            Expand-TreeViewItem -Item $item -Expand $true
+        }
+    })
+
+    # Collapse All button
+    $btnCollapseAll.Add_Click({
+        foreach ($item in $treeView.Items) {
+            Expand-TreeViewItem -Item $item -Expand $false
+        }
+    })
+
+    # Edit Data Source button
+    $btnEditDataSource.Add_Click({
+        $selectedItem = $dataSourcesList.SelectedItem
+        if ($null -eq $selectedItem) {
+            [System.Windows.MessageBox]::Show("Please select a data source to edit.", "No Selection", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+            return
+        }
+
+        # TODO: Implement edit data source dialog
+        [System.Windows.MessageBox]::Show("Edit data source functionality coming soon.", "Not Implemented", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+    })
+
+    # Remove Data Source button
+    $btnRemoveDataSource.Add_Click({
+        $selectedItem = $dataSourcesList.SelectedItem
+        if ($null -eq $selectedItem) {
+            [System.Windows.MessageBox]::Show("Please select a data source to remove.", "No Selection", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+            return
+        }
+
+        $result = [System.Windows.MessageBox]::Show(
+            "Are you sure you want to remove data source '$($selectedItem.Name)'?",
+            "Confirm Remove",
+            [System.Windows.MessageBoxButton]::YesNo,
+            [System.Windows.MessageBoxImage]::Question
+        )
+
+        if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
+            Remove-DataSource -Id $selectedItem.Id
+            $dataSourcesList.Items.Remove($selectedItem)
+            Update-StatusBar -StatusText $statusText -StatusElements $statusElements -Message "Data source removed: $($selectedItem.Name)" -Report $Script:CurrentReport
+        }
+    })
 
     # Report title change handler
     $txtReportTitle.Add_TextChanged({

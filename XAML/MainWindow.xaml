@@ -72,7 +72,7 @@
                 <ColumnDefinition Width="300" MinWidth="250"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Left Panel - Elements Toolbox & Tree -->
+            <!-- Left Panel - Data Sources & Elements Toolbox -->
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -81,125 +81,13 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Elements Toolbox Header -->
-                <Border Grid.Row="0" Padding="10">
-                    <TextBlock Text="📦 Elements" FontSize="14" FontWeight="SemiBold"/>
-                </Border>
-
-                <!-- Elements Toolbox -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel x:Name="ElementsToolbox" Margin="5">
-                        <Button x:Name="BtnAddTab" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📑 Tab</Button>
-                        <Button x:Name="BtnAddSection" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📦 Section</Button>
-                        <Button x:Name="BtnAddPanel" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">🗂️ Panel</Button>
-                        <Button x:Name="BtnAddTable" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📊 Table</Button>
-                        <Button x:Name="BtnAddChart" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📈 Chart</Button>
-                        <Button x:Name="BtnAddText" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📝 Text</Button>
-                    </StackPanel>
-                </ScrollViewer>
-
-                <!-- Report Structure Header -->
-                <Border Grid.Row="2" Padding="10">
-                    <TextBlock Text="🏗️ Report Structure" FontSize="14" FontWeight="SemiBold"/>
-                </Border>
-
-                <!-- Report Structure Tree -->
-                <TreeView x:Name="ReportTreeView" Grid.Row="3" BorderThickness="0" Margin="5"/>
-            </Grid>
-
-            <!-- Left Splitter -->
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
-
-            <!-- Center Panel - Visual Designer / Preview -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- Tab Control for Designer/Preview/Code -->
-                <TabControl Grid.Row="0" Grid.RowSpan="2" x:Name="MainTabControl" BorderThickness="0">
-                    <!-- Designer Tab -->
-                    <TabItem Header="🎨 Designer">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Report Title -->
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                                <Label Content="Report Title:"/>
-                                <TextBox x:Name="TxtReportTitle" Width="300" Padding="5" Margin="2" Text="New Report"/>
-                            </StackPanel>
-
-                            <!-- Design Canvas -->
-                            <Border Grid.Row="1" Margin="10" CornerRadius="5" BorderThickness="1" BorderBrush="Gray">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                                    <Canvas x:Name="DesignCanvas" Width="800" Height="600">
-                                        <TextBlock Canvas.Left="300" Canvas.Top="280" Text="Drag elements here" Foreground="Gray" FontSize="16"/>
-                                    </Canvas>
-                                </ScrollViewer>
-                            </Border>
-                        </Grid>
-                    </TabItem>
-
-                    <!-- Preview Tab -->
-                    <TabItem Header="👁️ Preview">
-                        <Grid>
-                            <WebBrowser x:Name="PreviewBrowser"/>
-                        </Grid>
-                    </TabItem>
-
-                    <!-- Code Tab -->
-                    <TabItem Header="💻 Generated Code">
-                        <Grid>
-                            <TextBox x:Name="TxtGeneratedCode"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     AcceptsTab="True"
-                                     TextWrapping="NoWrap"
-                                     HorizontalScrollBarVisibility="Auto"
-                                     VerticalScrollBarVisibility="Auto"
-                                     Padding="10"/>
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-            </Grid>
-
-            <!-- Right Splitter -->
-            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
-
-            <!-- Right Panel - Properties -->
-            <Grid Grid.Column="4">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="200"/>
-                </Grid.RowDefinitions>
-
-                <!-- Properties Header -->
-                <Border Grid.Row="0" Padding="10">
-                    <TextBlock Text="⚙️ Properties" FontSize="14" FontWeight="SemiBold"/>
-                </Border>
-
-                <!-- Properties Panel -->
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                    <StackPanel x:Name="PropertiesPanel" Margin="10">
-                        <TextBlock Text="Select an element to view its properties" Foreground="Gray" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </ScrollViewer>
-
                 <!-- Data Sources Header -->
-                <Border Grid.Row="2" Padding="10">
+                <Border Grid.Row="0" Padding="10">
                     <TextBlock Text="🗃️ Data Sources" FontSize="14" FontWeight="SemiBold"/>
                 </Border>
 
                 <!-- Data Sources List -->
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
@@ -217,11 +105,123 @@
                     </ListBox>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                        <Button x:Name="BtnAddDataSourcePanel" Content="➕" Padding="10,5" Margin="2"/>
-                        <Button x:Name="BtnEditDataSource" Content="✏️" Padding="10,5" Margin="2"/>
-                        <Button x:Name="BtnRemoveDataSource" Content="🗑️" Padding="10,5" Margin="2"/>
+                        <Button x:Name="BtnAddDataSourcePanel" Content="➕" ToolTip="Add Data Source" Padding="10,5" Margin="2"/>
+                        <Button x:Name="BtnEditDataSource" Content="✏️" ToolTip="Edit Data Source" Padding="10,5" Margin="2"/>
+                        <Button x:Name="BtnRemoveDataSource" Content="🗑️" ToolTip="Remove Data Source" Padding="10,5" Margin="2"/>
                     </StackPanel>
                 </Grid>
+
+                <!-- Elements Toolbox Header -->
+                <Border Grid.Row="2" Padding="10">
+                    <TextBlock Text="📦 Elements" FontSize="14" FontWeight="SemiBold"/>
+                </Border>
+
+                <!-- Elements Toolbox -->
+                <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="ElementsToolbox" Margin="5">
+                        <Button x:Name="BtnAddTab" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📑 Tab</Button>
+                        <Button x:Name="BtnAddSection" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📦 Section</Button>
+                        <Button x:Name="BtnAddPanel" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">🗂️ Panel</Button>
+                        <Button x:Name="BtnAddTable" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📊 Table</Button>
+                        <Button x:Name="BtnAddChart" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📈 Chart</Button>
+                        <Button x:Name="BtnAddText" HorizontalAlignment="Stretch" Padding="10,5" Margin="2">📝 Text</Button>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Left Splitter -->
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+
+            <!-- Center Panel - Report Structure / Code / Preview -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Tab Control for Structure/Code/Preview -->
+                <TabControl Grid.Row="0" Grid.RowSpan="2" x:Name="MainTabControl" BorderThickness="0">
+                    <!-- Report Structure Tab -->
+                    <TabItem Header="🏗️ Report Structure">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Report Title -->
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
+                                <Label Content="Report Title:"/>
+                                <TextBox x:Name="TxtReportTitle" Width="300" Padding="5" Margin="2" Text="New Report"/>
+                            </StackPanel>
+
+                            <!-- Structure Toolbar -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,0,10,5">
+                                <Button x:Name="BtnMoveUp" Content="⬆️" ToolTip="Move Up" Padding="10,5" Margin="2"/>
+                                <Button x:Name="BtnMoveDown" Content="⬇️" ToolTip="Move Down" Padding="10,5" Margin="2"/>
+                                <Button x:Name="BtnDeleteElement" Content="🗑️" ToolTip="Delete Element" Padding="10,5" Margin="2"/>
+                                <Separator Margin="5,0"/>
+                                <Button x:Name="BtnExpandAll" Content="➕" ToolTip="Expand All" Padding="10,5" Margin="2"/>
+                                <Button x:Name="BtnCollapseAll" Content="➖" ToolTip="Collapse All" Padding="10,5" Margin="2"/>
+                            </StackPanel>
+
+                            <!-- Report Structure Tree -->
+                            <Border Grid.Row="2" Margin="10" CornerRadius="5" BorderThickness="1" BorderBrush="Gray">
+                                <TreeView x:Name="ReportTreeView" BorderThickness="0" Margin="5"/>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Generated Code Tab -->
+                    <TabItem Header="💻 Generated Code">
+                        <Grid>
+                            <TextBox x:Name="TxtGeneratedCode"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     AcceptsTab="True"
+                                     TextWrapping="NoWrap"
+                                     HorizontalScrollBarVisibility="Auto"
+                                     VerticalScrollBarVisibility="Auto"
+                                     Padding="10"/>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Preview Tab -->
+                    <TabItem Header="👁️ Preview">
+                        <Grid>
+                            <WebBrowser x:Name="PreviewBrowser"/>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!-- Right Splitter -->
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
+
+            <!-- Right Panel - Properties -->
+            <Grid Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Properties Header -->
+                <Border Grid.Row="0" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="⚙️ Properties" FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="TxtSelectedElement" Text="No element selected" Foreground="Gray" FontSize="11" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Properties Panel -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="PropertiesPanel" Margin="10">
+                        <TextBlock Text="Select an element to view and edit its properties" Foreground="Gray" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
         </Grid>
 
